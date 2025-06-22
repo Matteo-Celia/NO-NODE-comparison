@@ -914,9 +914,12 @@ def compute_avg_loss_until_t(model="EGNO",t=0.99,n_part=5,num_inputs=1,varDT=Fal
     return index, avg_loss
 
 def compute_avg_loss_until_t_wandb(config, same_t=True, metric="MAE", std=True):
-    
-    (t_last, first) = (-1, config["num_timesteps"]) if config["model"] == "EGNO" else (2 if config["num_timesteps"]==10 else 4, 0)
-
+    if config["dataset"] == "gravity":
+        num_timesteps = 9
+    else:
+        num_timesteps = config["num_timesteps"]
+    (t_last, first) = (-1, num_timesteps) if config["model"] == "EGNO" else (2 if config["num_timesteps"]==10 else 4, 0)
+    print("t_last, first", t_last, first)
     num_timesteps = config["num_timesteps"]
     if metric=="MAE":
         #TODO check shape of stds and add energy calculation
@@ -934,6 +937,8 @@ def compute_avg_loss_until_t_wandb(config, same_t=True, metric="MAE", std=True):
             first_mae = mean_mae[first]
             if std:
                 return index, avg_mse, avg_std_mse, avg_mae, avg_std_mae, first_mse, first_mae, avg_ed, avg_std_ed
+            else:
+                return index, avg_mse, avg_mae, first_mse, first_mae, avg_ed
 
             return index, avg_mse, avg_mae, first_mse, first_mae
 
